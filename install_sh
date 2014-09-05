@@ -1,0 +1,51 @@
+#!/bin/sh
+
+#variable definitions
+INC_DIR_X86="/usr/include/CommLibInc_F"
+LIB_DIR_X86="/usr/lib/CommLibLib_F"
+
+INC_DIR_EBD="/root/installs/mips_CommLibInc_F"
+LIB_DIR_EBD="/root/installs/mips_CommLibLib_F"
+
+
+
+#Create the include folders for pc
+if [ ! -d ${INC_DIR_X86} ]
+then	
+	sudo mkdir ${INC_DIR_X86} 
+fi
+#Create the lib folders for pc
+if [ ! -d ${LIB_DIR_X86} ]
+then
+	sudo mkdir ${LIB_DIR_X86}
+fi
+
+
+
+
+#Create the include folders for embeded
+if [ ! -d ${INC_DIR_EBD} ]
+then
+	sudo mkdir ${INC_DIR_EBD}
+fi
+#Create the lib folders for embeded
+if [ ! -d ${LIB_DIR_EBD} ]
+then
+	sudo mkdir ${LIB_DIR_EBD}
+fi
+
+
+
+#copy head files
+sudo find . -type f -name "*.h" -exec cp {} ${INC_DIR_X86} \;
+sudo find . -type f -name "*.h" -exec cp {} ${INC_DIR_EBD} \;
+
+#if [ ! -d /usr/lib/CommLibLib_F ]
+#then
+#	sudo mkdir /usr/lib/CommLibLib_F
+#fi
+#sudo find ./Debug -name "*.a" -exec cp {} /usr/lib/CommLibLib_F \;
+#sudo find ./Debug -name "*.so" -exec cp {} /usr/lib/CommLibLib_F \;
+
+sudo cp ./Debug/libCommLib_F.so			${LIB_DIR_X86}
+sudo cp ./Debug_x/libCommLib_F_x.so		${LIB_DIR_EBD}
