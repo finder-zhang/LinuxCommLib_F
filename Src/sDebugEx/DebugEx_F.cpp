@@ -21,11 +21,13 @@ int CDebugExS_F::Open(int fd)
 //		_pDbgFile = NULL;
 //	}
 	_pDbgFile = fdopen(fd,"w");
+	return (_pDbgFile != NULL);
 }
 
 int CDebugExS_F::Open(FILE* pFile)
 {
 	_pDbgFile = pFile;
+	return TRUE;
 }
 
 int CDebugExS_F::Close()
@@ -34,6 +36,7 @@ int CDebugExS_F::Close()
 		fclose( _pDbgFile );
 		_pDbgFile = NULL;
 	}
+	return TRUE;
 }
 
 int CDebugExS_F::Printf(const char* ch,...)
@@ -49,11 +52,13 @@ int CDebugExS_F::Printf(const char* ch,...)
 int CDebugEx_F::Open(int fd)
 {
 	_pFile = fdopen(fd,"w");
+	return _pFile != NULL;
 }
 
 int CDebugEx_F::Open(FILE* pFile)
 {
 	_pFile = pFile;
+	return TRUE;
 }
 
 int CDebugEx_F::Close()
@@ -62,6 +67,7 @@ int CDebugEx_F::Close()
 		fclose( _pFile );
 		_pFile = NULL;
 	}
+	return TRUE;
 }
 
 int CDebugEx_F::Printf(const char* ch,...)

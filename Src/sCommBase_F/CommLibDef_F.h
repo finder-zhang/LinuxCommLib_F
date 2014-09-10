@@ -9,9 +9,10 @@
 #define __COMM_LIB_INC_F_H__
 
 
-typedef unsigned char BYTE,U8;
-typedef unsigned short WORD,U16;
-typedef unsigned long DWORD,U32;
+typedef unsigned char		BYTE,U8;
+typedef unsigned short		WORD,U16;
+typedef unsigned long		DWORD,U32;
+typedef int					FD_t;
 
 typedef int	BOOL;
 

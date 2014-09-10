@@ -19,6 +19,7 @@ serial_linux::serial_linux()
 	this->m_file_device = -1;
 	this->m_p_rx_func = 0;
 	this->m_p_user_data = 0;
+	m_tdRead = 0;
 	m_bReadLoop = 0;
 
 	//gamedata.m_bSerialStop = 1;
@@ -194,7 +195,10 @@ int serial_linux::create_rx_thread()
 {
 	if ( 1 == m_bReadLoop )
 		return RETURN_ERROR_F;
-	pthread_create(&m_tdRead,0,read_thread,this);
+	if (0 != pthread_create(&m_tdRead,0,read_thread,this)) {
+		m_tdRead = 0;
+		return RETURN_ERROR_F;
+	}
 	return RETURN_SUCCESS_F;
 }
 
