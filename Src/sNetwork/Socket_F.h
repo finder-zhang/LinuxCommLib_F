@@ -12,16 +12,23 @@
 #include <sys/socket.h>
 #include <CommLib_F.h>
 #include <netinet/in.h>
+#include <list>
+using namespace std;
 
 #include "TcpUdp_F.h"
 
 class CSocket_F
 {
 protected:
-	FD_t			_fd;
+	FD_t				_fd;				//打开的SOCKET FD
+	CTcp_F*			_pTcpServer;		//客户端连上后，对服务器读写的TCP接口
+	list<CTcp_F*>		_lsTcpClients;	//服务器端，连上的客户TCP接口
+
+	CUdp_F*			_pUdp;
 
 public:
 	CSocket_F();
+	~CSocket_F();
 	operator int ()
 	{
 		return _fd;
@@ -34,13 +41,13 @@ public:
 	BOOL TcpBind(const char* chPathName,int iMaxLink);						//本地SOCKET使用的绑定
 	BOOL TcpBind(const char* chIpAddr,in_port_t iPort,int iMaxLink);		//网络SOCKET使用的绑定
 
-	CTcp_F Accept();
+	CTcp_F* Accept();
 
-	CTcp_F TcpConnect(__CONST_SOCKADDR_ARG sa,socklen_t iLen);				//普遍可用的连接函数
-	CTcp_F TcpConnect(const char* chPathName);								//本地SOCKET使用的连接
-	CTcp_F TcpConnect(const char* chIpAddr,in_port_t iPort);				//网络SOCKET使用的连接
+	CTcp_F* TcpConnect(__CONST_SOCKADDR_ARG sa,socklen_t iLen);				//普遍可用的连接函数
+	CTcp_F* TcpConnect(const char* chPathName);								//本地SOCKET使用的连接
+	CTcp_F* TcpConnect(const char* chIpAddr,in_port_t iPort);				//网络SOCKET使用的连接
 
-	CUdp_F UdpBind(__CONST_SOCKADDR_ARG sa,socklen_t iLen);
+	CUdp_F* UdpBind(__CONST_SOCKADDR_ARG sa,socklen_t iLen);
 };
 
 

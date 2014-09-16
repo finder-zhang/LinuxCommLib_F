@@ -22,6 +22,15 @@
 CSocket_F::CSocket_F()
 {
 	_fd = -1;
+	_pTcpServer = NULL;
+	_pUdp = NULL;
+}
+
+CSocket_F::~CSocket_F()
+{
+	if ( -1 != _fd ) {
+		Close();
+	}
 }
 
 BOOL CSocket_F::Open(int iDomain,int iType,int iProtocol)
@@ -37,7 +46,19 @@ BOOL CSocket_F::Close()
 {
 	if ( -1 != _fd) {
 		close(_fd);
+		_fd = -1;
 	}
+	if ( _pUdp ) {
+		delete _pUdp;
+	}
+	if ( _pTcpServer ) {
+		delete _pTcpServer;
+	}
+	list<CTcp_F*>::iterator it;
+	for (it = _lsTcpClients.begin(); it!=_lsTcpClients.end(); ++it) {
+		delete (*it);
+	}
+	_lsTcpClients.clear();
 	return TRUE;
 }
 
@@ -69,20 +90,29 @@ BOOL CSocket_F::TcpBind(const char* chIpAddr,in_port_t iPort,int iMaxLink)
 	return TcpBind((__CONST_SOCKADDR_ARG)&ina,sizeof(ina),iMaxLink);
 }
 
-CTcp_F CSocket_F::Accept()
+CTcp_F* CSocket_F::Accept()
 {
-	return accept(_fd,NULL,0);
+	FD_t fd = accept(_fd,NULL,0);
+	if ( fd < 0 ) {
+		return NULL;
+	}
+	_lsTcpClients.push_back(new CTcp_F(fd));
+	return _lsTcpClients.back();
 }
 
-CTcp_F CSocket_F::TcpConnect(__CONST_SOCKADDR_ARG sa,socklen_t iLen)
+CTcp_F* CSocket_F::TcpConnect(__CONST_SOCKADDR_ARG sa,socklen_t iLen)
 {
 	if ( -1 == connect(_fd,sa,iLen) ) {
-		return CTcp_F(-1);
+		return NULL;
 	}
-	return CTcp_F(_fd);
+	if ( _pTcpServer ) {
+		delete _pTcpServer;
+	}
+	_pTcpServer = new CTcp_F(_fd);
+	return _pTcpServer;
 }
 
-CTcp_F CSocket_F::TcpConnect(const char* chPathName)
+CTcp_F* CSocket_F::TcpConnect(const char* chPathName)
 {
 	struct sockaddr_un una;
 	una.sun_family = AF_LOCAL;
@@ -90,7 +120,7 @@ CTcp_F CSocket_F::TcpConnect(const char* chPathName)
 	return TcpConnect((__CONST_SOCKADDR_ARG)&una, sizeof(una));
 }
 
-CTcp_F CSocket_F::TcpConnect(const char* chIpAddr,in_port_t iPort)
+CTcp_F* CSocket_F::TcpConnect(const char* chIpAddr,in_port_t iPort)
 {
 	struct sockaddr_in ina;
 	ina.sin_family = AF_INET;
@@ -99,12 +129,16 @@ CTcp_F CSocket_F::TcpConnect(const char* chIpAddr,in_port_t iPort)
 	return TcpConnect((__CONST_SOCKADDR_ARG)&ina,sizeof(ina));
 }
 
-CUdp_F CSocket_F::UdpBind(__CONST_SOCKADDR_ARG sa,socklen_t iLen)
+CUdp_F* CSocket_F::UdpBind(__CONST_SOCKADDR_ARG sa,socklen_t iLen)
 {
 	if ( -1 == bind(_fd,sa,iLen) ) {
-		return -1;
+		return NULL;
 	}
-	return _fd;
+	if ( _pUdp ) {
+		delete _pUdp;
+	}
+	_pUdp = new CUdp_F(_fd);
+	return _pUdp;
 }
 
 
