@@ -31,4 +31,5 @@ Src/sMathEx_F \
 Src/sFileEx_F \
 Src/sDebugEx \
 Src/sCommBase_F \
+Src/cJSON \
 

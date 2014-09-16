@@ -24,7 +24,7 @@ public:
 	typedef void (T::* MberFnPtrInCls)(void);	//类成员函数指针的模板
 	MberFnPtrInCls m_MTP;							//指向 T 类型的成员函数
 
-	MberFnPtr(){}
+	MberFnPtr():m_MTP(){}
 
 	MberFnPtr(MberFnPtrInCls mtp)
 	{

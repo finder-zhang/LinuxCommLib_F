@@ -10,11 +10,13 @@ RM := rm -rf
 -include sources.mk
 -include Src/sThreadEx_F/subdir.mk
 -include Src/sSerial_F/subdir.mk
+-include Src/sNetwork/subdir.mk
 -include Src/sMemMonitor/subdir.mk
 -include Src/sMathEx_F/subdir.mk
 -include Src/sFileEx_F/subdir.mk
+-include Src/sDebugEx/subdir.mk
 -include Src/sCommBase_F/subdir.mk
--include Src/sAlsaSound_F/subdir.mk
+-include Src/cJSON/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -44,19 +46,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: libCommLib_F.so
+all: libCommLib_F_xd.so
 
 # Tool invocations
-libCommLib_F.so: $(OBJS) $(USER_OBJS)
+libCommLib_F_xd.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	mipsel-linux-uclibc-g++ -shared -o "libCommLib_F.so" $(OBJS) $(USER_OBJS) $(LIBS)
+	mipsel-linux-uclibc-g++ -shared -o "libCommLib_F_xd.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(C++_DEPS)$(OBJS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) libCommLib_F.so
+	-$(RM) $(C++_DEPS)$(OBJS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) libCommLib_F_xd.so
 	-@echo ' '
 
 .PHONY: all clean dependents

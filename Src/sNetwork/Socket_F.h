@@ -49,20 +49,4 @@ public:
 
 
 
-class CLocalSocket_F : CSocket_F
-{
-public:
-	BOOL Open(int iType,int iProtocol);
-};
-
-
-class CNetSocket_F : CSocket_F
-{
-public:
-	BOOL Open(int type,__CONST_SOCKADDR_ARG addr);
-	BOOL Close();
-};
-
-
-
 #endif /* SOCKET_F_H_ */

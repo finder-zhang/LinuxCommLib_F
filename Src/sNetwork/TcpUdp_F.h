@@ -22,8 +22,8 @@ public:
 		return _fd;
 	}
 	BOOL IsValid();
-	size_t Read(void* outBuf,size_t len);
-	size_t Write(const void* inbBuf,size_t len);
+	ssize_t Read(void* outBuf,ssize_t iLen,int iFlags = 0);
+	ssize_t Write(const void* inBuf,ssize_t iLen,int iFlags = 0);
 };
 
 class CUdp_F
@@ -33,12 +33,13 @@ protected:
 
 public:
 	CUdp_F(FD_t fd);
+	BOOL IsValid();
 	operator FD_t()
 	{
 		return _fd;
 	}
-	size_t Read(void* outBuf,size_t len);
-	size_t Write(const void* inbBuf,size_t len);
+	ssize_t Read(void* outBuf,ssize_t iLen,int iFlags = 0);
+	ssize_t Write(const void* inBuf,ssize_t iLen,int iFlags = 0);
 };
 
 #endif /* TCPUDP_F_H_ */

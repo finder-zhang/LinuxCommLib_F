@@ -64,7 +64,7 @@ BOOL CSocket_F::TcpBind(const char* chIpAddr,in_port_t iPort,int iMaxLink)
 {
 	struct sockaddr_in ina;
 	ina.sin_family = AF_INET;
-	ina.sin_port = iPort;
+	ina.sin_port = htons(iPort);
 	ina.sin_addr.s_addr = inet_addr(chIpAddr);
 	return TcpBind((__CONST_SOCKADDR_ARG)&ina,sizeof(ina),iMaxLink);
 }
@@ -94,7 +94,7 @@ CTcp_F CSocket_F::TcpConnect(const char* chIpAddr,in_port_t iPort)
 {
 	struct sockaddr_in ina;
 	ina.sin_family = AF_INET;
-	ina.sin_port = iPort;
+	ina.sin_port = htons(iPort);
 	ina.sin_addr.s_addr = inet_addr(chIpAddr);
 	return TcpConnect((__CONST_SOCKADDR_ARG)&ina,sizeof(ina));
 }
@@ -106,31 +106,6 @@ CUdp_F CSocket_F::UdpBind(__CONST_SOCKADDR_ARG sa,socklen_t iLen)
 	}
 	return _fd;
 }
-
-
-
-BOOL CLocalSocket_F::Open(int iType,int iProtocol)
-{
-	return CSocket_F::Open(AF_LOCAL,iType,iProtocol);
-
-//	struct sockaddr_un addr;
-//	memset(&addr,0,sizeof(addr));
-//	addr.sun_family = AF_LOCAL;
-//	strcpy(addr.sun_path, chPathName);
-//	unlink(chPathName);
-//	CSocket_F::Open()
-//	_fd = socket(AF_LOCAL, type, 0);
-//	if( _fd < 0){
-//		return FALSE;
-//	}
-//	return TRUE;
-}
-
-
-
-
-
-
 
 
 

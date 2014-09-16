@@ -25,9 +25,11 @@ C_UPPER_DEPS :=
 SUBDIRS := \
 Src/sThreadEx_F \
 Src/sSerial_F \
+Src/sNetwork \
 Src/sMemMonitor \
 Src/sMathEx_F \
 Src/sFileEx_F \
+Src/sDebugEx \
 Src/sCommBase_F \
-Src/sAlsaSound_F \
+Src/cJSON \
 

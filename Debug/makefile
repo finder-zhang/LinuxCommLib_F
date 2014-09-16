@@ -16,6 +16,7 @@ RM := rm -rf
 -include Src/sFileEx_F/subdir.mk
 -include Src/sDebugEx/subdir.mk
 -include Src/sCommBase_F/subdir.mk
+-include Src/cJSON/subdir.mk
 -include subdir.mk
 -include objects.mk
 
