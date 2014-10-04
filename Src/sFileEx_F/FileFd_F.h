@@ -19,7 +19,7 @@ public:
 	};
 
 protected:
-	int m_fd;
+	FD_t m_fd;
 
 public:
 	static int IsFileExist(const char* chName);
@@ -27,7 +27,7 @@ public:
 	CFileFd_F();
 	virtual ~CFileFd_F();
 
-	operator int()
+	operator FD_t()
 	{
 		return m_fd;
 	}
@@ -42,8 +42,8 @@ public:
 	int Flush();
 	int Close();
 	int SetLength(U32 uLen);
-	U32 GetLength();
-	U32 GetCurrentPos();
+	ssize_t GetLength();
+	ssize_t GetCurrentPos();
 };
 
 

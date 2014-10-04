@@ -10,20 +10,28 @@
 
 #include <CommLib_F.h>
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 class CTcp_F
 {
 protected:
-	FD_t			_fd;
+	sockaddr_in	_sin;
+	fd_set			_fdset;
 
 public:
+	FD_t			m_fd;
 	CTcp_F(FD_t fd);
+	CTcp_F(FD_t fd,const sockaddr_in& sin);
 	operator FD_t()
 	{
-		return _fd;
+		return m_fd;
 	}
+	const sockaddr_in& GetInetAddr();
 	BOOL IsValid();
 	ssize_t Read(void* outBuf,ssize_t iLen,int iFlags = 0);
 	ssize_t Write(const void* inBuf,ssize_t iLen,int iFlags = 0);
+	BOOL WaitForReceive(U32 uMilliSeconds);
 };
 
 class CUdp_F

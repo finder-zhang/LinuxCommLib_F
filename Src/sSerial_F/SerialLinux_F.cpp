@@ -16,7 +16,7 @@
 
 serial_linux::serial_linux()
 {
-	this->m_file_device = -1;
+	this->m_fd = -1;
 	this->m_p_rx_func = 0;
 	this->m_p_user_data = 0;
 	m_tdRead = 0;
@@ -27,7 +27,7 @@ serial_linux::serial_linux()
 
 serial_linux::~serial_linux()
 {
-	if ( -1 != m_file_device )
+	if ( -1 != m_fd )
 	{
 		close_port();
 	}
@@ -35,14 +35,14 @@ serial_linux::~serial_linux()
 
 int serial_linux::open_port(const char* pDevName)
 {
-	m_file_device = open(pDevName,O_RDWR|O_NOCTTY|O_NDELAY);
-	if(m_file_device < 0)
+	m_fd = open(pDevName,O_RDWR|O_NOCTTY|O_NDELAY);
+	if(m_fd < 0)
 	{
 		perror("open serial port");
 		return 0;
 	}
 
-	if(fcntl(m_file_device,F_SETFL,0) < 0)
+	if(fcntl(m_fd,F_SETFL,0) < 0)
 	{
 		perror("fcntl F_SETFL\n");
 		return 0;
@@ -64,13 +64,13 @@ int serial_linux::open_port(const char* pDevName)
 
 int serial_linux::is_port_open()
 {
-	return m_file_device>=0;
+	return m_fd>=0;
 }
 
 int serial_linux::close_port()
 {
-	close(m_file_device);
-	m_file_device = -1;
+	close(m_fd);
+	m_fd = -1;
 	return RETURN_SUCCESS_F;
 }
 
@@ -80,7 +80,7 @@ int serial_linux::set_com(int baud_rate,int data_bits,char parity,int stop_bits)
 	struct termios  new_cfg,old_cfg;
 	int speed;
 
-	if(tcgetattr(m_file_device,&old_cfg) != 0)	 //保存旧的配置
+	if(tcgetattr(m_fd,&old_cfg) != 0)	 //保存旧的配置
 	{
 		perror("tcgetattr");
 		return RETURN_ERROR_F;
@@ -181,9 +181,9 @@ int serial_linux::set_com(int baud_rate,int data_bits,char parity,int stop_bits)
 	new_cfg.c_cc[VMIN] = 0;
 
 
-	tcflush(m_file_device,TCIFLUSH);		//清空缓存区
+	tcflush(m_fd,TCIFLUSH);		//清空缓存区
 
-	if((tcsetattr(m_file_device,TCSANOW,&new_cfg)) != 0)//激活配置
+	if((tcsetattr(m_fd,TCSANOW,&new_cfg)) != 0)//激活配置
 	{
 		perror("tcsetattr");
 		return -1;
@@ -222,7 +222,7 @@ void serial_linux::write_port(const void* buff,int len)
 	}
 	int nwrite;
 	//g_print("write_begin:...\n");
-	nwrite = write(m_file_device,buff,len);
+	nwrite = write(m_fd,buff,len);
 	if(nwrite == -1)
 	{
 		DBG_PRINT("Wirte to sbuf error.\n");
@@ -248,7 +248,7 @@ void* serial_linux::read_thread(void* p_data)
 	struct timeval timeout;
 
 	FD_ZERO(&rd);
-	FD_SET(pThis->m_file_device, &rd);
+	FD_SET(pThis->m_fd, &rd);
 	timeout.tv_sec = 1;
 	timeout.tv_usec = 0;
 
@@ -276,7 +276,7 @@ void* serial_linux::read_thread(void* p_data)
 		timeout.tv_usec = 0;
 		//static int a = 0;
 		//g_print("pre select 1111     %d\n",++a);
-		res = select(pThis->m_file_device + 1, &tmp_rd, NULL, NULL, &timeout);
+		res = select(pThis->m_fd + 1, &tmp_rd, NULL, NULL, &timeout);
 		//res = select(pThis->m_file_device + 1, &tmp_rd, NULL, NULL, 0);
 //		if(gamedata.m_bSerialStop)
 //			return 0;
@@ -288,9 +288,9 @@ void* serial_linux::read_thread(void* p_data)
 		case -1:
 			break;
 		default:
-			if (FD_ISSET(pThis->m_file_device,&tmp_rd))
+			if (FD_ISSET(pThis->m_fd,&tmp_rd))
 			{
-				while( 1 == read(pThis->m_file_device, &buff, 1) )
+				while( 1 == read(pThis->m_fd, &buff, 1) )
 				{
 
 					if (pThis->m_p_rx_func)

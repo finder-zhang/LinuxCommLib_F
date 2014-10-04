@@ -32,9 +32,9 @@ public:
 
 	operator int()
 	{
-		return m_file_device;
+		return m_fd;
 	}
-	int m_file_device;
+	int m_fd;
 
 	int is_port_open();
 	void set_rx_func(serial_rx_func p_func,void* p_user_data);

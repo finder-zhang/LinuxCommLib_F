@@ -30,6 +30,7 @@ Src/sNetwork \
 Src/sMemMonitor \
 Src/sMathEx_F \
 Src/sFileEx_F \
+Src/sEnDecode_F \
 Src/sDebugEx \
 Src/sCommBase_F \
 Src/cJSON \

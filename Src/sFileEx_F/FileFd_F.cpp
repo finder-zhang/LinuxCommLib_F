@@ -118,13 +118,13 @@ int CFileFd_F::Close()
 	return RETURN_ERROR_F;
 }
 
-U32 CFileFd_F::GetLength()
+ssize_t CFileFd_F::GetLength()
 {
-	U32 dwLen,dwCurPos;
-	dwCurPos = lseek(m_fd,0,SEEK_CUR);
-	dwLen = lseek(m_fd,0,SEEK_END);
-	lseek(m_fd,dwCurPos,SEEK_SET);
-	return dwLen;
+	ssize_t iLen,iCurPos;
+	iCurPos = lseek(m_fd,0,SEEK_CUR);
+	iLen = lseek(m_fd,0,SEEK_END);
+	lseek(m_fd,iCurPos,SEEK_SET);
+	return iLen;
 }
 
 int CFileFd_F::SetLength(U32 uLen)
@@ -132,7 +132,7 @@ int CFileFd_F::SetLength(U32 uLen)
 	return 0 == ftruncate(m_fd,uLen) ? RETURN_SUCCESS_F : RETURN_ERROR_F;
 }
 
-U32 CFileFd_F::GetCurrentPos()
+ssize_t CFileFd_F::GetCurrentPos()
 {
 	return lseek(m_fd,0,SEEK_CUR);
 }

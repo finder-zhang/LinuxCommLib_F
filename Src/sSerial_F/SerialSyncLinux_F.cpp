@@ -17,6 +17,10 @@
 CSerialSyncLinux_F::CSerialSyncLinux_F()
 {
 	m_fd = -1;
+	_fnRxCallback = NULL;
+	_bRxThreadExit = FALSE;
+	_eReadMode = RMODE_AUTO;
+	_bReading = FALSE;
 }
 
 CSerialSyncLinux_F::~CSerialSyncLinux_F()
@@ -24,12 +28,12 @@ CSerialSyncLinux_F::~CSerialSyncLinux_F()
 	Close();
 }
 
-CSerialSyncLinux_F::operator int()
+CSerialSyncLinux_F::operator FD_t()
 {
 	return m_fd;
 }
 
-int CSerialSyncLinux_F::Open(const char* pDevName)
+BOOL CSerialSyncLinux_F::Open(const char* pDevName)
 {
 	m_fd = open(pDevName,O_RDWR|O_NOCTTY|O_NDELAY);
 	if(m_fd < 0)
@@ -53,19 +57,24 @@ int CSerialSyncLinux_F::Open(const char* pDevName)
 	FD_ZERO(&m_fdsComm);
 	FD_SET(m_fd, &m_fdsComm);
 
+	_thRx.Create(_RxFunc,this);
+
 	return RETURN_SUCCESS_F;
 }
 
-int CSerialSyncLinux_F::IsOpened()
+BOOL CSerialSyncLinux_F::IsOpened()
 {
 	return (m_fd >= 0) ? RETURN_SUCCESS_F : RETURN_ERROR_F;
 }
 
-int CSerialSyncLinux_F::Close()
+BOOL CSerialSyncLinux_F::Close()
 {
 	if ( IsOpened() ) {
 		return RETURN_ERROR_F;
 	}
+
+	_bRxThreadExit = TRUE;
+	_thRx.Join();
 
 	FD_ZERO(&m_fdsComm);
 	close(m_fd);
@@ -73,7 +82,7 @@ int CSerialSyncLinux_F::Close()
 	return RETURN_SUCCESS_F;
 }
 
-ssize_t CSerialSyncLinux_F::Write(const void* pData,int iLen)
+size_t CSerialSyncLinux_F::Write(const void* pData,size_t iLen)
 {
 	if ( !IsOpened() ) {
 		return 0;
@@ -81,7 +90,7 @@ ssize_t CSerialSyncLinux_F::Write(const void* pData,int iLen)
 	return write(m_fd,pData,iLen);
 }
 
-int CSerialSyncLinux_F::WaitForReceive(struct timeval* ptvTime)
+BOOL CSerialSyncLinux_F::WaitForReceive(struct timeval* ptvTime)
 {
 	fd_set fdsCheck = m_fdsComm;
 	int iRes = select(m_fd+1,&fdsCheck,NULL,NULL,ptvTime);
@@ -111,13 +120,15 @@ int CSerialSyncLinux_F::WaitForReceive(struct timeval* ptvTime)
 //	}
 //}
 
-ssize_t CSerialSyncLinux_F::Read(void* pData,int iLen,int iMseconds)
+size_t CSerialSyncLinux_F::Read(void* pData,size_t iLen,int iTimeoutMilliSeconds)
 {
-	struct timeval timeout;
-	timeout.tv_sec = iMseconds / 1000;
-	timeout.tv_usec = (iMseconds % 1000) * 1000;
+	_bReading = TRUE;
 
-	int i=0;
+	struct timeval timeout;
+	timeout.tv_sec = iTimeoutMilliSeconds / 1000;
+	timeout.tv_usec = (iTimeoutMilliSeconds % 1000) * 1000;
+
+	size_t i=0;
 	for	(i=0;i<iLen;++i)
 	{
 		if (WaitForReceive(&timeout)) {
@@ -127,9 +138,56 @@ ssize_t CSerialSyncLinux_F::Read(void* pData,int iLen,int iMseconds)
 			break;
 		}
 	}
+	_bReading = FALSE;
 	return i;
 }
 
+BOOL CSerialSyncLinux_F::SetReadMode(ReadMode mode)
+{
+	if ( mode > RMODE_MAX_IDX ) {
+		return FALSE;
+	}
+	_eReadMode = mode;
+	return TRUE;
+}
+
+PFN_RX_CALLBACK CSerialSyncLinux_F::SetRxCallback(PFN_RX_CALLBACK fnCB)
+{
+	PFN_RX_CALLBACK fnTemp = _fnRxCallback;
+	_fnRxCallback = fnCB;
+	return fnTemp;
+}
+
+void* CSerialSyncLinux_F::_RxThread()
+{
+	struct timeval tm;
+	tm.tv_sec = 1;
+	tm.tv_usec = 0;
+
+	do
+	{
+		if ( WaitForReceive(&tm) ) {
+			if ( _fnRxCallback ) {
+				//in async mode,must call RxCallback
+				if ( RMODE_ASYNC == _eReadMode ) {
+					_fnRxCallback();
+				}
+				//in auto mode,if no one call Read(),then RxCallback be called
+				if ( (RMODE_AUTO == _eReadMode) && (FALSE == _bReading)  ) {
+					_fnRxCallback();
+				}
+			}
+		}
+	}while( FALSE == _bRxThreadExit );
+	_bRxThreadExit = FALSE;
+	return NULL;
+}
+
+void* CSerialSyncLinux_F::_RxFunc(void* pData)
+{
+	CSerialSyncLinux_F* pThis = (CSerialSyncLinux_F*)pData;
+	return pThis->_RxThread();
+}
 
 int CSerialSyncLinux_F::SetParam(int baud_rate,int data_bits,char parity,int stop_bits)
 {

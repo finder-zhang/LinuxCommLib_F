@@ -57,8 +57,8 @@ public:
 	CFileFdMmap_F();
 	~CFileFdMmap_F();
 
-	ssize_t Write(U32 dwPos,const void* pData,U32 dwLen);
-	ssize_t Read(U32 dwPos,void* pData,U32 dwLen);
+	ssize_t Write(ssize_t iPos,const void* pData,ssize_t iLen);
+	ssize_t Read(ssize_t iPos,void* pData,ssize_t iLen);
 
 	int Flush();
 	int Close();

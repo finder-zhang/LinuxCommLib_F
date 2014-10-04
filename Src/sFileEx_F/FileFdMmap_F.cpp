@@ -26,21 +26,21 @@ CFileFdMmap_F::~CFileFdMmap_F()
 	Close();
 }
 
-ssize_t CFileFdMmap_F::Write(U32 dwPos,const void* pData,U32 dwLen)
+ssize_t CFileFdMmap_F::Write(ssize_t iPos,const void* pData,ssize_t iLen)
 {
-	if (dwPos + dwLen > GetLength())
+	if (iPos + iLen > GetLength())
 		return 0;
-	memcpy(m_pData+dwPos,pData,dwLen);
+	memcpy(m_pData+iPos,pData,iLen);
 	fsync(m_fd);
-	return dwLen;
+	return iLen;
 }
 
-ssize_t CFileFdMmap_F::Read(U32 dwPos,void* pData,U32 dwLen)
+ssize_t CFileFdMmap_F::Read(ssize_t iPos,void* pData,ssize_t iLen)
 {
-	if (dwPos + dwLen > GetLength())
+	if (iPos + iLen > GetLength())
 		return 0;
-	memcpy(pData,m_pData+dwPos,dwLen);
-	return dwLen;
+	memcpy(pData,m_pData+iPos,iLen);
+	return iLen;
 }
 
 int CFileFdMmap_F::Close()

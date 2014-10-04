@@ -10,10 +10,12 @@ RM := rm -rf
 -include sources.mk
 -include Src/sThreadEx_F/subdir.mk
 -include Src/sSerial_F/subdir.mk
+-include Src/sProcessEx_F/subdir.mk
 -include Src/sNetwork/subdir.mk
 -include Src/sMemMonitor/subdir.mk
 -include Src/sMathEx_F/subdir.mk
 -include Src/sFileEx_F/subdir.mk
+-include Src/sEnDecode_F/subdir.mk
 -include Src/sDebugEx/subdir.mk
 -include Src/sCommBase_F/subdir.mk
 -include Src/cJSON/subdir.mk

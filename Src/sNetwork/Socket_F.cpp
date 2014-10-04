@@ -20,10 +20,11 @@
 
 
 CSocket_F::CSocket_F()
+:_fd(-1),
+_pTcpServer(NULL),
+_iMaxLink(0),
+_pUdp(NULL)
 {
-	_fd = -1;
-	_pTcpServer = NULL;
-	_pUdp = NULL;
 }
 
 CSocket_F::~CSocket_F()
@@ -70,6 +71,7 @@ BOOL CSocket_F::TcpBind(__CONST_SOCKADDR_ARG sa,socklen_t iLen,int iMaxLink)
     if ( -1 == listen(_fd,iMaxLink) ) {
     	return FALSE;
     }
+    _iMaxLink = iMaxLink;
 	return TRUE;
 }
 
@@ -92,11 +94,16 @@ BOOL CSocket_F::TcpBind(const char* chIpAddr,in_port_t iPort,int iMaxLink)
 
 CTcp_F* CSocket_F::Accept()
 {
-	FD_t fd = accept(_fd,NULL,0);
+	sockaddr saddr;
+	socklen_t slen;
+
+	//FD_t fd = accept(_fd,&saddr,&slen);
+	FD_t fd = accept(_fd,&saddr,&slen);
 	if ( fd < 0 ) {
 		return NULL;
 	}
-	_lsTcpClients.push_back(new CTcp_F(fd));
+	sockaddr_in* pSIN = (sockaddr_in*)&saddr;
+	_lsTcpClients.push_back(new CTcp_F(fd,*pSIN));
 	return _lsTcpClients.back();
 }
 
@@ -139,6 +146,11 @@ CUdp_F* CSocket_F::UdpBind(__CONST_SOCKADDR_ARG sa,socklen_t iLen)
 	}
 	_pUdp = new CUdp_F(_fd);
 	return _pUdp;
+}
+
+int CSocket_F::GetMaxLink()
+{
+	return _iMaxLink;
 }
 
 
