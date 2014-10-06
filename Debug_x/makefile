@@ -8,6 +8,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include Src/sTimeEx_F/subdir.mk
 -include Src/sThreadEx_F/subdir.mk
 -include Src/sSerial_F/subdir.mk
 -include Src/sProcessEx_F/subdir.mk

@@ -23,6 +23,7 @@ C_UPPER_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+Src/sTimeEx_F \
 Src/sThreadEx_F \
 Src/sSerial_F \
 Src/sProcessEx_F \
