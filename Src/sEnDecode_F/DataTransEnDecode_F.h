@@ -28,7 +28,7 @@ extern "C" {
 //inLen		要解包的长度	以上总长度
 //outBuf	数据内容		长度（2B）数据（=长度）
 //outLen	数据长度		以上总长度
-typedef U8 (*fnTransEnDecode_t)(const U8* inBuf,U16 inLen,U8* outBuf,U16* outLen);
+typedef BOOL (*fnTransEnDecode_t)(const void* inBuf,U16 inLen,void* outBuf,U16* outLen);
 
 
 typedef struct _TransEnDecodeFunc

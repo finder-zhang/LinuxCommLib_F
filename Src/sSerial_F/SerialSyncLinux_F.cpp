@@ -151,10 +151,11 @@ BOOL CSerialSyncLinux_F::SetReadMode(ReadMode mode)
 	return TRUE;
 }
 
-PFN_RX_CALLBACK CSerialSyncLinux_F::SetRxCallback(PFN_RX_CALLBACK fnCB)
+PFN_RX_HANDLER CSerialSyncLinux_F::SetRxHandler(PFN_RX_HANDLER fnCB,void* pData)
 {
-	PFN_RX_CALLBACK fnTemp = _fnRxCallback;
+	PFN_RX_HANDLER fnTemp = _fnRxCallback;
 	_fnRxCallback = fnCB;
+	_pRxHandlerData = pData;
 	return fnTemp;
 }
 
@@ -170,11 +171,11 @@ void* CSerialSyncLinux_F::_RxThread()
 			if ( _fnRxCallback ) {
 				//in async mode,must call RxCallback
 				if ( RMODE_ASYNC == _eReadMode ) {
-					_fnRxCallback();
+					_fnRxCallback(_pRxHandlerData);
 				}
 				//in auto mode,if no one call Read(),then RxCallback be called
 				if ( (RMODE_AUTO == _eReadMode) && (FALSE == _bReading)  ) {
-					_fnRxCallback();
+					_fnRxCallback(_pRxHandlerData);
 				}
 			}
 		}

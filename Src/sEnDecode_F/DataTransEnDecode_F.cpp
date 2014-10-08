@@ -3,10 +3,10 @@
 
 
 static U8 _CreateCRC(const U8* inBuf,U16 inLen);
-static U8 _DataEncode(const U8 * inBuf,U16 inLen,U8 * outBuf,U16* outLen);
+static BOOL _DataEncode(const void * pIn,U16 inLen,void * pOut,U16* outLen);
 
 //static U8 _CheckCRC(const U8* inBuf,U16 inLen);
-static U8 _DataDecode(const U8 * inBuf,U16 inLen,U8 * outBuf,U16* outLen);
+static BOOL _DataDecode(const void * pIn,U16 inLen,void * pOout,U16* outLen);
 
 
 #define CODE_STX				(0x02)
@@ -67,54 +67,57 @@ static U8 _MakeU8CRC(U16 wCRC)
 }
 
 //基础打包
-static U8 _DataEncode(const U8 * inBuf,U16 inLen,U8 * outBuf,U16* outLen)
+static BOOL _DataEncode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 {
 	U16 i = 0;
 	U16 oi = EPOS_DATA;	//为了书写方便，使用中间变量 oi 而不使用 *outLen
 	
+	const U8* pIn = (const U8*)inBuf;
+	U8* pOut = (U8*)outBuf;
+
 //处理开始字节
-	outBuf[EPOS_STX] = CODE_STX;
+	pOut[EPOS_STX] = CODE_STX;
 	
 //处理数据
 	for	(i=0; i<inLen; ++i,++oi) {
-		switch (inBuf[i]) {
+		switch (pIn[i]) {
 		//所有特殊码执行同样的动作，前面加'/'，后面最高位置1
 		case CODE_STX:
 		case CODE_ETX:
 		case '/':
-			outBuf[oi] = '/';
+			pOut[oi] = '/';
 			++oi;
-			outBuf[oi] = inBuf[i] | 0x80;
+			pOut[oi] = pIn[i] | 0x80;
 			break;
 		default:
 		//非特殊码直接放到输出
-			outBuf[oi] = inBuf[i];
+			pOut[oi] = pIn[i];
 			break;
 		}
 	}
 	
 //处理长度
 	U16 wLen = oi - EPOS_DOFFSET;	//这时 oi 位于 CRC处，oi - EPOS_DOFFSET 为数据长度
-	outBuf[EPOS_LEN0] = wLen << 4;
-	outBuf[EPOS_LEN1] = wLen & 0x00F0;
-	outBuf[EPOS_LEN2] = (wLen >> 4) & 0x00F0;
-	outBuf[EPOS_LEN3] = (wLen >> 8) & 0x00F0;
+	pOut[EPOS_LEN0] = wLen << 4;
+	pOut[EPOS_LEN1] = wLen & 0x00F0;
+	pOut[EPOS_LEN2] = (wLen >> 4) & 0x00F0;
+	pOut[EPOS_LEN3] = (wLen >> 8) & 0x00F0;
 	
 //处理校验
-	U8 uCRC = _CreateCRC(&outBuf[EPOS_LEN0],wLen+EPOS_LENSIZE);	//CRC运算内容为长度与数据
+	U8 uCRC = _CreateCRC(&pOut[EPOS_LEN0],wLen+EPOS_LENSIZE);	//CRC运算内容为长度与数据
 	U16 wCRC = _MakeU16CRC(uCRC);
-	outBuf[oi] = wCRC;
+	pOut[oi] = wCRC;
 	++oi;
-	outBuf[oi] = wCRC >> 8;
+	pOut[oi] = wCRC >> 8;
 	++oi;
 	
 //处理ETX
-	outBuf[oi] = CODE_ETX;
+	pOut[oi] = CODE_ETX;
 	++oi;
 	
 //处理总长度
 	*outLen	= oi;	//outLen为打包输出的总长度，包括STX,ETX
-	return 1;
+	return TRUE;
 }
 
 
@@ -122,24 +125,28 @@ static U8 _DataEncode(const U8 * inBuf,U16 inLen,U8 * outBuf,U16* outLen)
 
 
 //基础解包
-static U8 _DataDecode(const U8 * inBuf,U16 inLen,U8 * outBuf,U16* outLen)
+static BOOL _DataDecode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 {
 	U16 i = 0;
 	U16 oi = 0;
+
+	const U8* pIn = (const U8*)inBuf;
+	U8* pOut = (U8*)outBuf;
+
 //执行初步数据正确性校验
-	if ( CODE_STX != inBuf[EPOS_STX] || CODE_ETX != inBuf[inLen-1] )
+	if ( CODE_STX != pIn[EPOS_STX] || CODE_ETX != pIn[inLen-1] )
 	{
 		*outLen = 0;
 		return 0;
 	}
 
 //取得长度
-	U16 wLen = (inBuf[EPOS_LEN0] >> 4) | inBuf[EPOS_LEN1] 
-		| (inBuf[EPOS_LEN2] << 4) | (inBuf[EPOS_LEN3] << 8);
+	U16 wLen = (pIn[EPOS_LEN0] >> 4) | pIn[EPOS_LEN1]
+		| (pIn[EPOS_LEN2] << 4) | (pIn[EPOS_LEN3] << 8);
 	
 //检查CRC	
-	U8 uCRC = _CreateCRC(inBuf+EPOS_LEN0,wLen+EPOS_LENSIZE);
-	U8 uRxCRC = _MakeU8CRC(inBuf[wLen+5] | (inBuf[wLen+6])<<8 );
+	U8 uCRC = _CreateCRC(pIn+EPOS_LEN0,wLen+EPOS_LENSIZE);
+	U8 uRxCRC = _MakeU8CRC(pIn[wLen+5] | (pIn[wLen+6])<<8 );
 	if ( uCRC != uRxCRC ) {
 		*outLen = 0;
 		return 0;
@@ -149,26 +156,26 @@ static U8 _DataDecode(const U8 * inBuf,U16 inLen,U8 * outBuf,U16* outLen)
 	for (i=0; i<wLen; ++i,++oi)
 	{
 		//特殊码特殊处理
-		if ( '/' == inBuf[EPOS_DATA + i] ) {
-			switch ( inBuf[EPOS_DATA + i + 1] ) {
+		if ( '/' == pIn[EPOS_DATA + i] ) {
+			switch ( pIn[EPOS_DATA + i + 1] ) {
 			case '/':
-				outBuf[oi] = '/';
+				pOut[oi] = '/';
 				break;
 			default:
-				outBuf[oi] = inBuf[EPOS_DATA + i + 1] & 0x7F;
+				pOut[oi] = pIn[EPOS_DATA + i + 1] & 0x7F;
 				break;
 			}
 			++i;
 		}
 		//常规数据不用处理
 		else {
-			outBuf[oi] = inBuf[EPOS_DATA + i];
+			pOut[oi] = pIn[EPOS_DATA + i];
 		}
 	}
 	
 //处理总长度
 	*outLen = oi;
-	return 1;
+	return TRUE;
 }
 
 

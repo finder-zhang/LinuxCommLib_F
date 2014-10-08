@@ -10,14 +10,14 @@
 
 #include <pthread.h>
 
-class CThreadMutex_F
+class CMutex_F
 {
 protected:
 	pthread_mutex_t		m_Mutex;
 
 public:
-	CThreadMutex_F();
-	~CThreadMutex_F();
+	CMutex_F();
+	~CMutex_F();
 
 	int Lock();
 	int TimedLock(const struct timespec *abstime);

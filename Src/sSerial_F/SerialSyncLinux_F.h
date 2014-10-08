@@ -12,7 +12,7 @@
 #include <sys/select.h>
 #include "CommLib_F.h"
 
-typedef void (*PFN_RX_CALLBACK)(void);
+typedef void (*PFN_RX_HANDLER)(void*);
 
 class CSerialSyncLinux_F
 {
@@ -38,11 +38,12 @@ public:
 protected:
 	fd_set					m_fdsComm;
 	FD_t					m_fd;
-	PFN_RX_CALLBACK		_fnRxCallback;
+	PFN_RX_HANDLER		_fnRxCallback;
 	CThread_F				_thRx;
 	BOOL					_bRxThreadExit;
 	ReadMode				_eReadMode;
 	BOOL					_bReading;
+	void*					_pRxHandlerData;
 
 public:
 	CSerialSyncLinux_F();
@@ -55,7 +56,7 @@ public:
 	BOOL Close();
 	BOOL SetParam(int baud_rate,int data_bits = 8,char parity = 'N',int stop_bits = 1);
 	BOOL SetReadMode(ReadMode mode);
-	PFN_RX_CALLBACK SetRxCallback(PFN_RX_CALLBACK fnCB);
+	PFN_RX_HANDLER SetRxHandler(PFN_RX_HANDLER fnCB,void* pData);
 
 	size_t Write(const void* pData,size_t iLen);
 	size_t Read(void* pData,size_t iLen,int iTimeoutMilliSeconds = 0);

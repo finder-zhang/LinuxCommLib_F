@@ -7,40 +7,40 @@
 
 #include "CommLib_F.h"
 
-#include "ThreadMutex_F.h"
+#include "Mutex_F.h"
 
 
-CThreadMutex_F::CThreadMutex_F()
+CMutex_F::CMutex_F()
 {
 	pthread_mutex_init(&m_Mutex,0);
 }
 
-CThreadMutex_F::~CThreadMutex_F()
+CMutex_F::~CMutex_F()
 {
 	pthread_mutex_destroy(&m_Mutex);
 }
 
-int CThreadMutex_F::Lock()
+int CMutex_F::Lock()
 {
 	return pthread_mutex_lock(&m_Mutex);
 }
 
-int CThreadMutex_F::TimedLock(const struct timespec *abstime)
+int CMutex_F::TimedLock(const struct timespec *abstime)
 {
 	return pthread_mutex_timedlock(&m_Mutex,abstime);
 }
 
-int CThreadMutex_F::Unlock()
+int CMutex_F::Unlock()
 {
 	return pthread_mutex_unlock(&m_Mutex);
 }
 
-int CThreadMutex_F::TryLock()
+int CMutex_F::TryLock()
 {
 	return pthread_mutex_trylock(&m_Mutex);
 }
 
-int CThreadMutex_F::IsLocked()
+int CMutex_F::IsLocked()
 {
 	int iRet = pthread_mutex_trylock(&m_Mutex);
 	if ( 0 == iRet )
