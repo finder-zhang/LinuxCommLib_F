@@ -11,8 +11,18 @@
 #include <stdio.h>
 
 #ifdef DEBUG
-#define Dprintf(...)			CDebugEx_F::Printf(__VA_ARGS__)
+//#define Dprintf(...)			CDebugEx_F::Printf(__VA_ARGS__)
 #endif //DEBUG
+
+
+//use stdout as debug output
+//Dsop means Debug standard out Print
+//Want to use Dsop,remember to define DEBUG_F
+#ifdef DEBUG_F
+#define Dsop(...)					fprintf(stdout,__VA_ARGS__)
+#else
+#define Dsop(...)
+#endif//DEBUG
 
 
 

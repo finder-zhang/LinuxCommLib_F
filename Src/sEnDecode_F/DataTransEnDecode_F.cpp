@@ -1,5 +1,6 @@
 #include "DataTransEnDecode_F.h"
 
+#include "DebugEx_F.h"
 
 
 static U8 _CreateCRC(const U8* inBuf,U16 inLen);
@@ -9,8 +10,12 @@ static BOOL _DataEncode(const void * pIn,U16 inLen,void * pOut,U16* outLen);
 static BOOL _DataDecode(const void * pIn,U16 inLen,void * pOout,U16* outLen);
 
 
-#define CODE_STX				(0x02)
-#define CODE_ETX				(0x03)
+//#define CODE_STX				(0x02)
+//#define CODE_ETX				(0x03)
+
+#define CODE_STX					(0xFA)
+#define CODE_ETX					(0xFB)
+
 
 enum OriginPos
 {
@@ -87,7 +92,7 @@ static BOOL _DataEncode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 		case '/':
 			pOut[oi] = '/';
 			++oi;
-			pOut[oi] = pIn[i] | 0x80;
+			pOut[oi] = pIn[i] ^ 0x80;
 			break;
 		default:
 		//非特殊码直接放到输出
@@ -137,16 +142,21 @@ static BOOL _DataDecode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 	if ( CODE_STX != pIn[EPOS_STX] || CODE_ETX != pIn[inLen-1] )
 	{
 		*outLen = 0;
-		return 0;
+		Dsop("stx etx verify failed!\r\n");
+		return FALSE;
 	}
+	//Dsop("stx etx verify successful!\r\n");
 
 //取得长度
 	U16 wLen = (pIn[EPOS_LEN0] >> 4) | pIn[EPOS_LEN1]
 		| (pIn[EPOS_LEN2] << 4) | (pIn[EPOS_LEN3] << 8);
 	
-//检查CRC	
+	//Dsop("data len = %d\r\n",wLen);
+
+//检查CRC
 	U8 uCRC = _CreateCRC(pIn+EPOS_LEN0,wLen+EPOS_LENSIZE);
 	U8 uRxCRC = _MakeU8CRC(pIn[wLen+5] | (pIn[wLen+6])<<8 );
+	Dsop("crc = %02x,rxCrc = %02x\r\n",uCRC,uRxCRC);
 	if ( uCRC != uRxCRC ) {
 		*outLen = 0;
 		return 0;
@@ -162,7 +172,7 @@ static BOOL _DataDecode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 				pOut[oi] = '/';
 				break;
 			default:
-				pOut[oi] = pIn[EPOS_DATA + i + 1] & 0x7F;
+				pOut[oi] = pIn[EPOS_DATA + i + 1] ^ 0x80;
 				break;
 			}
 			++i;
@@ -189,7 +199,7 @@ void DataTransInit(PTransEnDecodeFunc_t pTransFunc)
 static CatchPackageStatus		_cps = CPS_NULL;
 static U8		_uRxBuf[256];
 static U16		_wRxPtr = 0;
-static BOOL		_bPackageOk = FALSE;
+static volatile BOOL		_bPackageOk = FALSE;
 //static U16		_wRxLen = 0;
 
 inline static void _Rollback()
@@ -206,11 +216,30 @@ inline static void _NewStart(U8 uByte)
 }
 
 
+//Pass the receive datas byte by byte,and this function will
+//catch the content between 0x02 and 0x03,and 0x02 0x03 is included
+//For example there is a series like
+//0x01 0x02 0x81 0x82 0x83 0x03 0x04 0x05 0x02 ... 0x03
+//the first byte 0x01 will be drop,and the sub series
+//0x02 0x81 0x82 0x83 0x03 will be catch
+//and the below 0x04 0x05 will be dropped.
+
+//When DEN_CatchPackage returns CPS_COMPLETE,it will lock the status
+//continue call DEN_CatchPackage will return CPS_LOCKED.
+//Till we call DEN_GetPackage to get the result,
+//the status will be unlock and we can start a new DEN_CatchPackage
+
+//About the returns
+//When DEN_CatchPackage got a package successful,
+//it will lock the status and fill the result via some global variables.
+//_bPackageOk		use to lock the status
+//_wRxPtr			use to count the package length
+//_uRxBuf			is the package
 CatchPackageStatus DEN_CatchPackage(U8 uByte)
 {
 	//数据包已经成功但并未被读取之前，丢弃输入的字节
 	if ( TRUE == _bPackageOk ) {
-		_cps = CPS_NULL;
+		_cps = CPS_LOCKED;
 		return _cps;
 	}
 
@@ -245,8 +274,8 @@ CatchPackageStatus DEN_CatchPackage(U8 uByte)
 
 	//收到其他的数据，在 CATCHING 状态下，把数据放起来
 	if ( CPS_CATCHING == _cps ) {
-		++_wRxPtr;
 		_uRxBuf[_wRxPtr] = uByte;
+		++_wRxPtr;
 	}
 
 	return _cps;
@@ -256,10 +285,23 @@ CatchPackageStatus DEN_CatchPackage(U8 uByte)
 BOOL DEN_GetPackage(U16* pwLen,U8* pData)
 {
 	if ( FALSE == _bPackageOk ) {
+		Dsop("DEN_GetPackage bPackageOk = FALSE\r\n");
 		return FALSE;
 	}
+
+	Dsop("start Data Decode\r\n");
+	for (U16 i=0;i<_wRxPtr;++i)
+	{
+		Dsop("Decode[%02d] = %02x\r\n",i,_uRxBuf[i]);
+	}
+	BOOL bDecode = _DataDecode(_uRxBuf,_wRxPtr,pData,pwLen);
 	_bPackageOk = FALSE;
-	return _DataDecode(_uRxBuf,_wRxPtr,pData,pwLen);
+	return bDecode;
+}
+
+BOOL DEN_IsBusy()
+{
+	return _bPackageOk;
 }
 
 

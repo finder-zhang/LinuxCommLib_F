@@ -49,19 +49,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: libCommLib_F.so
+all: libCommLib_F_x.so
 
 # Tool invocations
-libCommLib_F.so: $(OBJS) $(USER_OBJS)
+libCommLib_F_x.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	mipsel-linux-uclibc-g++ -shared -o "libCommLib_F.so" $(OBJS) $(USER_OBJS) $(LIBS)
+	mipsel-linux-uclibc-g++ -shared -o "libCommLib_F_x.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(C++_DEPS)$(OBJS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) libCommLib_F.so
+	-$(RM) $(C++_DEPS)$(OBJS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) libCommLib_F_x.so
 	-@echo ' '
 
 .PHONY: all clean dependents

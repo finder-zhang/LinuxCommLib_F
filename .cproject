@@ -58,6 +58,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/sThreadEx_F}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/sFileEx_F}&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1376543895" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG_F"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1276693481" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1613471249" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
@@ -117,7 +120,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/CommLib_F/Release"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/CommLib_F/Release_with_Cross GCC"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/CommLib_F/Release_x"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="CommLib_F" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="CommLib_F_x" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -130,7 +133,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="cross" id="cdt.managedbuild.config.gnu.cross.so.release.599463898" name="Release_x" parent="cdt.managedbuild.config.gnu.cross.so.release">
+				<configuration artifactExtension="so" artifactName="${ProjName}_x" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="cross" id="cdt.managedbuild.config.gnu.cross.so.release.599463898" name="Release_x" parent="cdt.managedbuild.config.gnu.cross.so.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.so.release.599463898." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.so.release.578521388" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.so.release">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.1435940682" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="mipsel-linux-uclibc-" valueType="string"/>
@@ -222,7 +225,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/sSerial_F}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Src/sThreadEx_F}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.335973277" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.335973277" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG_F"/>
+								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.969579427" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.preprocess.499072637" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.other.other.697802651" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0" valueType="string"/>
@@ -257,6 +262,14 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="cdt.managedbuild.config.gnu.so.debug.79069182.1190180387" name="SerialSyncLinux_F.cpp" rcbsApplicability="disable" resourcePath="Src/sSerial_F/SerialSyncLinux_F.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628.829622631">
+						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628.829622631" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628">
+							<option id="gnu.cpp.compiler.option.preprocessor.def.186642851" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<listOptionValue builtIn="false" value="PRE_DEF_CPU_X86"/>
+							</option>
+							<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.468570210" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+						</tool>
+					</fileInfo>
 					<fileInfo id="cdt.managedbuild.config.gnu.so.debug.79069182.2066227118" name="SerialLinux_F.cpp" rcbsApplicability="disable" resourcePath="Src/sSerial_F/SerialLinux_F.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628.1705959960">
 						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628.1705959960" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628">
 							<option id="gnu.cpp.compiler.option.preprocessor.def.1182291940" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
@@ -271,14 +284,6 @@
 							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1777113672" name="Resource Custom Build Step Output Type"/>
 						</tool>
 					</fileInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.so.debug.79069182.1190180387" name="SerialSyncLinux_F.cpp" rcbsApplicability="disable" resourcePath="Src/sSerial_F/SerialSyncLinux_F.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628.829622631">
-						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628.829622631" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.777323628">
-							<option id="gnu.cpp.compiler.option.preprocessor.def.186642851" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-								<listOptionValue builtIn="false" value="PRE_DEF_CPU_X86"/>
-							</option>
-							<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.468570210" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
-						</tool>
-					</fileInfo>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -290,7 +295,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/CommLib_F"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/CommLib_F/Release"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/CommLib_F/Release_with_Linux GCC"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="CommLib_F_x" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="CommLib_F" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -303,7 +308,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so" artifactName="${ProjName}_x" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="x86" id="cdt.managedbuild.config.gnu.so.release.1255889988" name="Release" parent="cdt.managedbuild.config.gnu.so.release">
+				<configuration artifactExtension="so" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="x86" id="cdt.managedbuild.config.gnu.so.release.1255889988" name="Release" parent="cdt.managedbuild.config.gnu.so.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.release.1255889988." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.release.1081954327" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.release">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.release.44103983" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.release"/>

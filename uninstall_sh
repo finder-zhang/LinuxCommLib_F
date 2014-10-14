@@ -1,0 +1,26 @@
+#!/bin/sh
+
+#variable definitions
+INC_DIR_X86="/usr/include/CommLibInc_F"
+LIB_DIR_X86="/usr/lib"
+
+INC_DIR_EBD="/root/installs/mips_CommLibInc_F"
+LIB_DIR_EBD="/root/installs/mips_CommLibLib_F"
+
+
+#delete the include folder for pc
+sudo rm ${INC_DIR_X86} -rf
+
+#delete the lib files for pc
+sudo rm ${LIB_DIR_X86}/libCommLib_Fd.so
+sudo rm ${LIB_DIR_X86}/libCommLib_F.so
+
+
+#delete the include folder for embeded
+sudo rm ${INC_DIR_EBD} -rf
+
+
+#delete the lib folders for embeded
+sudo rm ${LIB_DIR_EBD} -rf
+
+

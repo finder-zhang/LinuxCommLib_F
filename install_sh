@@ -50,3 +50,6 @@ sudo find . -type f -name "*.h" -exec cp {} ${INC_DIR_EBD} \;
 
 sudo cp ./Debug/libCommLib_Fd.so		${LIB_DIR_X86}
 sudo cp ./Debug_x/libCommLib_F_xd.so		${LIB_DIR_EBD}
+sudo cp ./Release/libCommLib_F.so		${LIB_DIR_X86}
+sudo cp ./Release_x/libCommLib_F_x.so		${LIB_DIR_EBD}
+
