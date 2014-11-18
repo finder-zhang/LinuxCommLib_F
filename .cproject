@@ -72,6 +72,7 @@
 									<listOptionValue builtIn="false" value="pthread"/>
 									<listOptionValue builtIn="false" value="rt"/>
 								</option>
+								<option id="gnu.cpp.link.option.flags.1630113948" superClass="gnu.cpp.link.option.flags" value="-fno-common" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1289833293" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -170,6 +171,7 @@
 									<listOptionValue builtIn="false" value="pthread"/>
 									<listOptionValue builtIn="false" value="rt"/>
 								</option>
+								<option id="gnu.cpp.link.option.flags.40093563" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-fno-common" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1085704778" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -252,6 +254,7 @@
 									<listOptionValue builtIn="false" value="pthread"/>
 									<listOptionValue builtIn="false" value="rt"/>
 								</option>
+								<option id="gnu.cpp.link.option.flags.286820711" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-fno-common" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.246447206" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -345,6 +348,7 @@
 									<listOptionValue builtIn="false" value="pthread"/>
 									<listOptionValue builtIn="false" value="rt"/>
 								</option>
+								<option id="gnu.cpp.link.option.flags.1927045672" superClass="gnu.cpp.link.option.flags" value="-fno-common" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.693126732" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

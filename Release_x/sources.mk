@@ -34,5 +34,6 @@ Src/sFileEx_F \
 Src/sEnDecode_F \
 Src/sDebugEx \
 Src/sCommBase_F \
+Src/sAes_F \
 Src/cJSON \
 

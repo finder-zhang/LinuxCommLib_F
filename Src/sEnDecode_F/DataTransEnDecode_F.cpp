@@ -80,6 +80,11 @@ static BOOL _DataEncode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 	const U8* pIn = (const U8*)inBuf;
 	U8* pOut = (U8*)outBuf;
 
+	U16 wLen = 0;
+
+	U8 uCRC = 0;
+	U16 wCRC = 0;
+
 //处理开始字节
 	pOut[EPOS_STX] = CODE_STX;
 	
@@ -102,15 +107,15 @@ static BOOL _DataEncode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 	}
 	
 //处理长度
-	U16 wLen = oi - EPOS_DOFFSET;	//这时 oi 位于 CRC处，oi - EPOS_DOFFSET 为数据长度
+	wLen = oi - EPOS_DOFFSET;	//这时 oi 位于 CRC处，oi - EPOS_DOFFSET 为数据长度
 	pOut[EPOS_LEN0] = wLen << 4;
 	pOut[EPOS_LEN1] = wLen & 0x00F0;
 	pOut[EPOS_LEN2] = (wLen >> 4) & 0x00F0;
 	pOut[EPOS_LEN3] = (wLen >> 8) & 0x00F0;
 	
 //处理校验
-	U8 uCRC = _CreateCRC(&pOut[EPOS_LEN0],wLen+EPOS_LENSIZE);	//CRC运算内容为长度与数据
-	U16 wCRC = _MakeU16CRC(uCRC);
+	uCRC = _CreateCRC(&pOut[EPOS_LEN0],wLen+EPOS_LENSIZE);	//CRC运算内容为长度与数据
+	wCRC = _MakeU16CRC(uCRC);
 	pOut[oi] = wCRC;
 	++oi;
 	pOut[oi] = wCRC >> 8;
@@ -138,6 +143,11 @@ static BOOL _DataDecode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 	const U8* pIn = (const U8*)inBuf;
 	U8* pOut = (U8*)outBuf;
 
+	U16 wLen = 0;
+
+	U8 uCRC = 0;
+	U8 uRxCRC = 0;
+
 //执行初步数据正确性校验
 	if ( CODE_STX != pIn[EPOS_STX] || CODE_ETX != pIn[inLen-1] )
 	{
@@ -148,15 +158,19 @@ static BOOL _DataDecode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 	//Dsop("stx etx verify successful!\r\n");
 
 //取得长度
-	U16 wLen = (pIn[EPOS_LEN0] >> 4) | pIn[EPOS_LEN1]
+	wLen = (pIn[EPOS_LEN0] >> 4) | pIn[EPOS_LEN1]
 		| (pIn[EPOS_LEN2] << 4) | (pIn[EPOS_LEN3] << 8);
 	
+	if (wLen != (inLen - 8) ) {
+		return FALSE;
+	}
+
 	//Dsop("data len = %d\r\n",wLen);
 
 //检查CRC
-	U8 uCRC = _CreateCRC(pIn+EPOS_LEN0,wLen+EPOS_LENSIZE);
-	U8 uRxCRC = _MakeU8CRC(pIn[wLen+5] | (pIn[wLen+6])<<8 );
-	Dsop("crc = %02x,rxCrc = %02x\r\n",uCRC,uRxCRC);
+	uCRC = _CreateCRC(pIn+EPOS_LEN0,wLen+EPOS_LENSIZE);
+	uRxCRC = _MakeU8CRC(pIn[wLen+5] | (pIn[wLen+6])<<8 );
+	//Dsop("crc = %02x,rxCrc = %02x\r\n",uCRC,uRxCRC);
 	if ( uCRC != uRxCRC ) {
 		*outLen = 0;
 		return 0;
@@ -284,17 +298,19 @@ CatchPackageStatus DEN_CatchPackage(U8 uByte)
 
 BOOL DEN_GetPackage(U16* pwLen,U8* pData)
 {
+	BOOL bDecode = FALSE;
+
 	if ( FALSE == _bPackageOk ) {
 		Dsop("DEN_GetPackage bPackageOk = FALSE\r\n");
 		return FALSE;
 	}
 
-	Dsop("start Data Decode\r\n");
-	for (U16 i=0;i<_wRxPtr;++i)
-	{
-		Dsop("Decode[%02d] = %02x\r\n",i,_uRxBuf[i]);
-	}
-	BOOL bDecode = _DataDecode(_uRxBuf,_wRxPtr,pData,pwLen);
+//	Dsop("start Data Decode\r\n");
+//	for (U16 i=0;i<_wRxPtr;++i)
+//	{
+//		Dsop("Decode[%02d] = %02x\r\n",i,_uRxBuf[i]);
+//	}
+	bDecode = _DataDecode(_uRxBuf,_wRxPtr,pData,pwLen);
 	_bPackageOk = FALSE;
 	return bDecode;
 }

@@ -4,14 +4,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../Src/sNetwork/FdSelector_F.cpp \
 ../Src/sNetwork/Socket_F.cpp \
 ../Src/sNetwork/TcpUdp_F.cpp 
 
 OBJS += \
+./Src/sNetwork/FdSelector_F.o \
 ./Src/sNetwork/Socket_F.o \
 ./Src/sNetwork/TcpUdp_F.o 
 
 CPP_DEPS += \
+./Src/sNetwork/FdSelector_F.d \
 ./Src/sNetwork/Socket_F.d \
 ./Src/sNetwork/TcpUdp_F.d 
 

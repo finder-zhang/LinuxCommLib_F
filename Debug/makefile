@@ -19,6 +19,7 @@ RM := rm -rf
 -include Src/sEnDecode_F/subdir.mk
 -include Src/sDebugEx/subdir.mk
 -include Src/sCommBase_F/subdir.mk
+-include Src/sAes_F/subdir.mk
 -include Src/cJSON/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -55,7 +56,7 @@ all: libCommLib_Fd.so
 libCommLib_Fd.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -shared -o "libCommLib_Fd.so" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -fno-common -shared -o "libCommLib_Fd.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

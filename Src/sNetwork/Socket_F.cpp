@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include "Socket_F.h"
 
+#include "DebugEx_F.h"
 
 
 
@@ -40,6 +41,8 @@ BOOL CSocket_F::Open(int iDomain,int iType,int iProtocol)
 	if ( -1 == _fd ) {
 		return FALSE;
 	}
+	BOOL bReuseaddr = TRUE;
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &bReuseaddr,sizeof(BOOL));
 	return TRUE;
 }
 
@@ -66,6 +69,7 @@ BOOL CSocket_F::Close()
 BOOL CSocket_F::TcpBind(__CONST_SOCKADDR_ARG sa,socklen_t iLen,int iMaxLink)
 {
     if ( -1 == bind(_fd,sa,iLen) ) {
+    	Dsop("bind failed!\n");
     	return FALSE;
     }
     if ( -1 == listen(_fd,iMaxLink) ) {

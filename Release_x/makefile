@@ -19,6 +19,7 @@ RM := rm -rf
 -include Src/sEnDecode_F/subdir.mk
 -include Src/sDebugEx/subdir.mk
 -include Src/sCommBase_F/subdir.mk
+-include Src/sAes_F/subdir.mk
 -include Src/cJSON/subdir.mk
 -include subdir.mk
 -include objects.mk
@@ -55,7 +56,7 @@ all: libCommLib_F_x.so
 libCommLib_F_x.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	mipsel-linux-uclibc-g++ -shared -o "libCommLib_F_x.so" $(OBJS) $(USER_OBJS) $(LIBS)
+	mipsel-linux-uclibc-g++ -fno-common -shared -o "libCommLib_F_x.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

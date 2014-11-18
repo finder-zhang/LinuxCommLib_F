@@ -4,7 +4,8 @@ Src/sNetwork/Socket_F.d Src/sNetwork/Socket_F.o:  \
   /root/workspace/CommLib_F/Src/sCommBase_F/CommLibDef_F.h \
   /root/workspace/CommLib_F/Src/sCommBase_F/CommLibBase_F.h \
   /root/workspace/CommLib_F/Src/sCommBase_F/CommLibImpl_F.h \
-  ../Src/sNetwork/TcpUdp_F.h
+  ../Src/sNetwork/TcpUdp_F.h \
+  /root/workspace/CommLib_F/Src/sDebugEx/DebugEx_F.h
 
 ../Src/sNetwork/Socket_F.h:
 
@@ -17,3 +18,5 @@ Src/sNetwork/Socket_F.d Src/sNetwork/Socket_F.o:  \
 /root/workspace/CommLib_F/Src/sCommBase_F/CommLibImpl_F.h:
 
 ../Src/sNetwork/TcpUdp_F.h:
+
+/root/workspace/CommLib_F/Src/sDebugEx/DebugEx_F.h:

@@ -29,7 +29,7 @@ protected:
 public:
 	CSocket_F();
 	~CSocket_F();
-	operator int ()
+	operator FD_t ()
 	{
 		return _fd;
 	}
