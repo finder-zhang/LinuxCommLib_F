@@ -1,13 +1,12 @@
-#include "DataTransEnDecode_F.h"
+
+#include "DataPackage_F.h"
+#include "DataPackageImpl_F.h"
 
 #include "DebugEx_F.h"
 
 
-static U8 _CreateCRC(const U8* inBuf,U16 inLen);
-static BOOL _DataEncode(const void * pIn,U16 inLen,void * pOut,U16* outLen);
 
-//static U8 _CheckCRC(const U8* inBuf,U16 inLen);
-static BOOL _DataDecode(const void * pIn,U16 inLen,void * pOout,U16* outLen);
+static U8 _CreateCRC(const U8* inBuf,U16 inLen);
 
 
 //#define CODE_STX				(0x02)
@@ -23,7 +22,6 @@ enum OriginPos
 	OPOS_LENL		= 1,
 	OPOS_LENH		= 2,
 	OPOS_DATA		= 3,
-	
 };
 
 enum EncodePos
@@ -58,7 +56,7 @@ static U8 _CreateCRC(const U8* inBuf,U16 inLen)
 //	return inBuf[inLen] == _CreateCRC(inBuf,inLen - 1);
 //}
 
-//为了使CRC不会出现0x02 0x03 等特殊编码，把CRC拆成2个字节，每个
+//为了使CRC不会出现STX ETX 等特殊编码，把CRC拆成2个字节，每个
 //字节的高4位放原来CRC的内容。
 static U16 _MakeU16CRC(U8 uCRC)
 {
@@ -72,7 +70,7 @@ static U8 _MakeU8CRC(U16 wCRC)
 }
 
 //基础打包
-static BOOL _DataEncode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
+void DPKG_DataPackage(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 {
 	U16 i = 0;
 	U16 oi = EPOS_DATA;	//为了书写方便，使用中间变量 oi 而不使用 *outLen
@@ -127,7 +125,6 @@ static BOOL _DataEncode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 	
 //处理总长度
 	*outLen	= oi;	//outLen为打包输出的总长度，包括STX,ETX
-	return TRUE;
 }
 
 
@@ -135,7 +132,7 @@ static BOOL _DataEncode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 
 
 //基础解包
-static BOOL _DataDecode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
+BOOL DPKG_DataUnpackage(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 {
 	U16 i = 0;
 	U16 oi = 0;
@@ -144,7 +141,6 @@ static BOOL _DataDecode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 	U8* pOut = (U8*)outBuf;
 
 	U16 wLen = 0;
-
 	U8 uCRC = 0;
 	U8 uRxCRC = 0;
 
@@ -203,32 +199,41 @@ static BOOL _DataDecode(const void * inBuf,U16 inLen,void * outBuf,U16* outLen)
 }
 
 
-void DataTransInit(PTransEnDecodeFunc_t pTransFunc)
+
+
+
+
+
+
+
+
+inline static void _Rollback(DPackageOperator_t* pDO)
 {
-	pTransFunc->pfnEncode = _DataEncode;
-	pTransFunc->pfnDecode = _DataDecode;
+	pDO->_wRxPtr = 0;
+	pDO->_cps = CPS_NULL;
+}
+
+inline static void _NewStart(DPackageOperator_t* pDO,U8 uByte)
+{
+	pDO->_uRxBuf[0] = uByte;
+	pDO->_wRxPtr = 1;
+	pDO->_cps = CPS_CATCHING;
 }
 
 
-static CatchPackageStatus		_cps = CPS_NULL;
-static U8		_uRxBuf[256];
-static U16		_wRxPtr = 0;
-static volatile BOOL		_bPackageOk = FALSE;
-//static U16		_wRxLen = 0;
 
-inline static void _Rollback()
+
+DPackageHandle DPKG_Open()
 {
-	_wRxPtr = 0;
-	_cps = CPS_NULL;
+	return malloc(sizeof(DPackageOperator_t));
 }
 
-inline static void _NewStart(U8 uByte)
+void DPKG_Close(DPackageHandle hDP)
 {
-	_uRxBuf[0] = uByte;
-	_wRxPtr = 1;
-	_cps = CPS_CATCHING;
+	if (hDP) {
+		free(hDP);
+	}
 }
-
 
 //Pass the receive datas byte by byte,and this function will
 //catch the content between 0x02 and 0x03,and 0x02 0x03 is included
@@ -249,12 +254,14 @@ inline static void _NewStart(U8 uByte)
 //_bPackageOk		use to lock the status
 //_wRxPtr			use to count the package length
 //_uRxBuf			is the package
-CatchPackageStatus DEN_CatchPackage(U8 uByte)
+CatchPackageStatus DPKG_CatchPackage(DPackageHandle hDP,U8 uByte)
 {
+	DPackageOperator_t* pDO = (DPackageOperator_t*)hDP;
+
 	//数据包已经成功但并未被读取之前，丢弃输入的字节
-	if ( TRUE == _bPackageOk ) {
-		_cps = CPS_LOCKED;
-		return _cps;
+	if ( TRUE == pDO->_bPackageOk ) {
+		pDO->_cps = CPS_LOCKED;
+		return pDO->_cps;
 	}
 
 	//任意时刻，只要见到 CODE_STX 就是一个全新的开始。
@@ -262,45 +269,46 @@ CatchPackageStatus DEN_CatchPackage(U8 uByte)
 //		_cps = CPS_CATCHING;
 //		_uRxBuf[0] = CODE_STX;
 //		_wRxPtr = 1;
-		_NewStart(uByte);
-		return _cps;
+		_NewStart(pDO,uByte);
+		return pDO->_cps;
 	}
 
 
 	if ( CODE_ETX == uByte ) {
 		//收到 CODE_ETX 的时候，如果状态不对，则全部清空重来
-		if ( _cps != CPS_CATCHING ) {
+		if ( pDO->_cps != CPS_CATCHING ) {
 //			_cps = CPS_NULL;
 //			_wRxPtr = 0;
-			_Rollback();
-			return _cps;
+			_Rollback(pDO);
+			return pDO->_cps;
 		}
 		//收到 CODE_ETX 的时候，如果状态对，则数据包接收成功
 		else {
-			_uRxBuf[_wRxPtr] = CODE_ETX;
-			++_wRxPtr;
-			_cps = CPS_COMPLETE;
-			_bPackageOk = TRUE;
-			return _cps;
+			pDO->_uRxBuf[pDO->_wRxPtr] = CODE_ETX;
+			++(pDO->_wRxPtr);
+			pDO->_cps = CPS_COMPLETE;
+			pDO->_bPackageOk = TRUE;
+			return pDO->_cps;
 		}
 	}
 
 
 	//收到其他的数据，在 CATCHING 状态下，把数据放起来
-	if ( CPS_CATCHING == _cps ) {
-		_uRxBuf[_wRxPtr] = uByte;
-		++_wRxPtr;
+	if ( CPS_CATCHING ==  pDO->_cps ) {
+		pDO->_uRxBuf[pDO->_wRxPtr] = uByte;
+		++(pDO->_wRxPtr);
 	}
 
-	return _cps;
+	return pDO->_cps;
 }
 
 
-BOOL DEN_GetPackage(U16* pwLen,U8* pData)
+BOOL DPKG_GetPackage(DPackageHandle hDP,U16* pwLen,U8* pData)
 {
+	DPackageOperator_t* pDO = (DPackageOperator_t*)hDP;
 	BOOL bDecode = FALSE;
 
-	if ( FALSE == _bPackageOk ) {
+	if ( FALSE == pDO->_bPackageOk ) {
 		Dsop("DEN_GetPackage bPackageOk = FALSE\r\n");
 		return FALSE;
 	}
@@ -310,14 +318,14 @@ BOOL DEN_GetPackage(U16* pwLen,U8* pData)
 //	{
 //		Dsop("Decode[%02d] = %02x\r\n",i,_uRxBuf[i]);
 //	}
-	bDecode = _DataDecode(_uRxBuf,_wRxPtr,pData,pwLen);
-	_bPackageOk = FALSE;
+	bDecode = DPKG_DataUnpackage(pDO->_uRxBuf,pDO->_wRxPtr,pData,pwLen);
+	pDO->_bPackageOk = FALSE;
 	return bDecode;
 }
 
-BOOL DEN_IsBusy()
+BOOL DPKG_IsBusy(DPackageHandle hDP)
 {
-	return _bPackageOk;
+	return ((DPackageOperator_t*)hDP)->_bPackageOk;
 }
 
 

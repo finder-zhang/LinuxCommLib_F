@@ -9,12 +9,13 @@
 #include "CommLib_F.h"
 
 #ifndef __cplusplus
-#define __cplusplus
+//#define __cplusplus
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif //
+
 
 //打包与解包接口函数
 //对于打包时
@@ -28,14 +29,9 @@ extern "C" {
 //inLen		要解包的长度	以上总长度
 //outBuf	数据内容		长度（2B）数据（=长度）
 //outLen	数据长度		以上总长度
-typedef BOOL (*fnTransEnDecode_t)(const void* inBuf,U16 inLen,void* outBuf,U16* outLen);
+//typedef BOOL (*fnTransEnDecode_t)(const void* inBuf,U16 inLen,void* outBuf,U16* outLen);
 
-
-typedef struct _TransEnDecodeFunc
-{
-	fnTransEnDecode_t		pfnEncode;
-	fnTransEnDecode_t		pfnDecode;
-}TransEnDecodeFunc_t,*PTransEnDecodeFunc_t;
+typedef void*			DPackageHandle;
 
 typedef enum _CatchPackageStatus
 {
@@ -46,37 +42,54 @@ typedef enum _CatchPackageStatus
 //	CPS_DATA_ERROR
 }CatchPackageStatus;
 
-
-
-
-void DataTransInit(PTransEnDecodeFunc_t pTransFunc);
-
-
-
-
+DPackageHandle DPKG_Open();
+void DPKG_Close(DPackageHandle hDP);
 
 //This function use in serial "get byte interrupt".
 //If your serial have not so call "get byte interrupt" but
 //just a got something interrupt,please make the get byte interrupt yourself.
-//Anyhow,every byte we got,pass to DEN_CatchPackage and check the result.
-CatchPackageStatus DEN_CatchPackage(U8 uByte);
-
+//Anyhow,every byte we got,pass to DPKG_CatchPackage and check the result.
+CatchPackageStatus DPKG_CatchPackage(DPackageHandle hDP,U8 uByte);
 
 //When DEN_CatchPackage returns CPS_COMPLETE,continue call
 //DEN_CatchPackage will returns CPS_LOCKED.
 //Till we call DEN_GetPackage to get the result,
-//the status will be unlock and we can start a new DEN_CatchPackage
-BOOL DEN_GetPackage(U16* pwLen,U8* pData);
-
+//the status will be unlock and we can start a new DPKG_CatchPackage
+BOOL DPKG_GetPackage(DPackageHandle hDP,U16* pwLen,U8* pData);
 
 //DEN_IsBusy will return true when the status is locked.
-BOOL DEN_IsBusy();
+BOOL DPKG_IsBusy(DPackageHandle hP);
 
-
+void DPKG_DataPackage(const void * pIn,U16 inLen,void * pOut,U16* outLen);
+BOOL DPKG_DataUnpackage(const void * pIn,U16 inLen,void * pOut,U16* outLen);
 
 #ifdef __cplusplus
 }
 #endif //
+
+
+
+#ifdef __cplusplus
+class CDataPackage_F
+{
+protected:
+	DPackageHandle		_hPkg;
+
+public:
+	CDataPackage_F(){_hPkg = DPKG_Open();}
+	~CDataPackage_F(){DPKG_Close(_hPkg);}
+
+	CatchPackageStatus CatchPackage(U8 uByte){return DPKG_CatchPackage(_hPkg,uByte);}
+	BOOL GetPackage(U16* pwLen,U8* pData){return DPKG_GetPackage(_hPkg,pwLen,pData);}
+	BOOL IsBusy(){return DPKG_IsBusy(_hPkg);}
+
+	static void DataPackage(const void* pIn,U16 inLen,void* pOut,U16* outLen)
+	{DPKG_DataPackage(pIn,inLen,pOut,outLen);}
+	static BOOL DataUnpackage(const void * pIn,U16 inLen,void * pOut,U16* outLen)
+	{return DPKG_DataUnpackage(pIn,inLen,pOut,outLen);}
+};
+#endif //__cplusplus
+
 
 
 #endif //__DATA_TRANS_EN_DECODE_F_H__
