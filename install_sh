@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #variable definitions
-INC_DIR_X86="/usr/include/CommLibInc_F"
+INC_DIR_X86="/usr/include/comm_lib_inc_f"
 LIB_DIR_X86="/usr/lib"
 
 INC_DIR_EBD="/root/installs/mips_CommLibInc_F"
