@@ -107,7 +107,7 @@ CTcp_F* CSocket_F::Accept()
 		return NULL;
 	}
 	sockaddr_in* pSIN = (sockaddr_in*)&saddr;
-	_lsTcpClients.push_back(new CTcp_F(fd,*pSIN));
+	_lsTcpClients.push_back(new CTcp_F(fd,pSIN));
 	return _lsTcpClients.back();
 }
 

@@ -15,9 +15,9 @@ CTcp_F::CTcp_F(FD_t fd)
 	FD_SET(fd, &_fdset);
 }
 
-CTcp_F::CTcp_F(FD_t fd,const sockaddr_in& sin)
+CTcp_F::CTcp_F(FD_t fd,const sockaddr_in* sin)
 :m_fd(fd),
-_sin(sin)
+_sin(*sin)
 {
 	FD_ZERO(&_fdset);
 	FD_SET(fd, &_fdset);

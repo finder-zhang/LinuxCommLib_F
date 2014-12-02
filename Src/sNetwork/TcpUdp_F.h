@@ -22,7 +22,7 @@ protected:
 public:
 	FD_t			m_fd;
 	CTcp_F(FD_t fd);
-	CTcp_F(FD_t fd,const sockaddr_in& sin);
+	CTcp_F(FD_t fd,const sockaddr_in* sin);
 	operator FD_t()
 	{
 		return m_fd;
